@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Validator with Caesar Cipher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        #sentence-input {
+            width: 300px;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        #check-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sentence Validator with Caesar Cipher</h1>
+
+    <label for="sentence-input">Enter a sentence:</label>
+    <input type="text" id="sentence-input" placeholder="Type a sentence...">
+
+    <button id="check-btn" onclick="checkSentenceValidity()">Check</button>
+
+    <div id="result"></div>
+
+    <script>
+        // Load valid words from wordlist.txt
+        const wordListRequest = new XMLHttpRequest();
+        wordListRequest.open('GET', 'wordlist.txt', false);  // synchronous request
+        wordListRequest.send();
+
+        let validWords = [];
+
+        if (wordListRequest.status === 200) {
+            validWords = wordListRequest.responseText.split('\n').map(word => word.trim().toLowerCase());
+        } else {
+            console.error('Error loading wordlist:', wordListRequest.statusText);
+        }
+
+        // Function to check if a sentence can be decoded with any Caesar shift value
+        function checkSentenceValidity() {
+            // Get the sentence from the input field
+            const sentence = document.getElementById('sentence-input').value.toLowerCase();
+
+            // Try decoding the sentence with different Caesar shift values
+            let decodedSentence;
+            let decodedShift = -1;
+            for (let shift = 1; shift <= 25; shift++) {
+                decodedSentence = applyCaesarDecipherToSentence(sentence, shift);
+                if (containsValidWords(decodedSentence)) {
+                    decodedShift = shift;
+                    break;
+                }
+            }
+            // Display the result
+            if (decodedShift !== -1) {
+                document.getElementById('result').innerHTML = `<strong>${sentence}</strong> can be decoded with a Caesar shift of ${decodedShift}. Decoded sentence: <strong>${decodedSentence}</strong>.`;
+            } else {
+                document.getElementById('result').innerHTML = `<strong>${sentence}</strong> cannot be decoded with a Caesar shift.`;
+            }
+        }
+
+        // Function to apply Caesar decipher to a sentence
+        function applyCaesarDecipherToSentence(sentence, shift) {
+            const words = sentence.split(/\s+/);
+            return words.map(word => applyCaesarDecipher(word, shift)).join(' ');
+        }
+
+        // Function to check if a sentence contains valid words
+        function containsValidWords(sentence) {
+            const words = sentence.split(/\s+/);
+            return words.every(word => validWords.includes(word));
+        }
+
+        // Function to apply Caesar decipher to a word
+        function applyCaesarDecipher(word, shift) {
+            let result = '';
+            for (let i = 0; i < word.length; i++) {
+                const charCode = word.charCodeAt(i);
+                let decryptedCharCode;
+                if (charCode >= 97 && charCode <= 122) { // lowercase letters
+                    decryptedCharCode = (charCode - 97 - shift + 26) % 26 + 97;
+                } else if (charCode >= 65 && charCode <= 90) { // uppercase letters
+                    decryptedCharCode = (charCode - 65 - shift + 26) % 26 + 65;
+                } else {
+                    decryptedCharCode = charCode; // non-alphabetic characters
+                }
+                result += String.fromCharCode(decryptedCharCode);
+            }
+            return result;
+        }
+    </script>
+
+</body>
+</html>
