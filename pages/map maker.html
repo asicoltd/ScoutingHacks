@@ -117,8 +117,8 @@
 
             // Your logic for calculating map coordinates based on degree and steps
             // This is a placeholder, replace it with your actual calculation
-            const mapX = centerX + steps * Math.cos(degree+90 * (Math.PI / 180));
-            const mapY = centerY + steps * Math.sin(degree+90 * (Math.PI / 180));
+            const mapX = centerX + steps * Math.cos(degree-90 * (Math.PI / 180));
+            const mapY = centerY + steps * Math.sin(degree-90 * (Math.PI / 180));
 
             // Display the map point with serial number, degree, and steps
             const mapPoint = { x: mapX, y: mapY, serial: serialNumber, degree: degree, steps: steps };
