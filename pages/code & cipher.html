@@ -59,27 +59,31 @@
             // Get the sentence from the input field
             const sentence = document.getElementById('sentence-input').value.toLowerCase();
 
-            // Try decoding the sentence with different Caesar shift values
-            let decodedSentence;
+            // Initialize variables to store results
+            let resultsHTML = '';
             let decodedShift = -1;
+
+            // Try decoding the sentence with different Caesar shift values
             for (let shift = 0; shift <= 25; shift++) {
-                decodedSentence = applyCaesarDecipherToSentence(sentence, shift);
+                const decodedSentence = applyCaesarDecipherToSentence(sentence, shift);
+                resultsHTML += `<p>Shift ${shift}: ${decodedSentence}</p>`;
+                
                 if (containsValidWords(decodedSentence)) {
                     decodedShift = shift;
                     break;
                 }
             }
+
             // Display the result
+            const resultDiv = document.getElementById('result');
             if (decodedShift !== -1) {
-                if( decodedShift !== 0){
-                document.getElementById('result').innerHTML = `<strong>${sentence}</strong> can be decoded with a Caesar shift of ${decodedShift}. Decoded sentence: <strong>${decodedSentence}</strong>.`;
-                }
-                else {
-                    document.getElementById('result').innerHTML = `<strong>${sentence}</strong> is a correct sentence.';
-                }
-                } else {
-                document.getElementById('result').innerHTML = `<strong>${sentence}</strong> cannot be decoded with a Caesar shift.`;
+                resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with a Caesar shift of ${decodedShift}. Decoded sentence: <strong>${applyCaesarDecipherToSentence(sentence, decodedShift)}</strong>.`;
+            } else {
+                resultDiv.innerHTML = `<strong>${sentence}</strong> cannot be decoded with any Caesar shift.`;
             }
+
+            // Display all attempted shifts and results
+            resultDiv.innerHTML += resultsHTML;
         }
 
         // Function to apply Caesar decipher to a sentence
