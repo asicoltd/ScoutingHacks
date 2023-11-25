@@ -27,6 +27,12 @@
             margin-top: 20px;
             font-size: 18px;
         }
+
+        .valid-word {
+            background-color: yellow;
+            padding: 2px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -61,23 +67,32 @@
 
             // Initialize variables to store results
             let resultsHTML = '';
-            let decodedShift = -1;
+            let decodedShifts = [];
 
             // Try decoding the sentence with different Caesar shift values
             for (let shift = 0; shift <= 25; shift++) {
                 const decodedSentence = applyCaesarDecipherToSentence(sentence, shift);
-                resultsHTML += `<p>Shift ${shift}: ${decodedSentence}</p>`;
+                const { validWordCount, highlightedSentence } = highlightValidWords(decodedSentence);
+
+                resultsHTML += `<p>Shift ${shift}: ${highlightedSentence} (${validWordCount} valid words)</p>`;
                 
-                if (containsValidWords(decodedSentence)) {
-                    decodedShift = shift;
-                    break;
+                if (validWordCount > 0) {
+                    decodedShifts.push({ shift, decodedSentence });
                 }
             }
 
             // Display the result
             const resultDiv = document.getElementById('result');
-            if (decodedShift !== -1) {
-                resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with a Caesar shift of ${decodedShift}. Decoded sentence: <strong>${applyCaesarDecipherToSentence(sentence, decodedShift)}</strong>.`;
+            if (decodedShifts.length > 0) {
+                resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with the following Caesar shifts: `;
+                decodedShifts.forEach(entry => {
+                    resultDiv.innerHTML += `<strong>${entry.shift}</strong>, `;
+                });
+                resultDiv.innerHTML = resultDiv.innerHTML.slice(0, -2) + `.<br>`;
+                
+                decodedShifts.forEach(entry => {
+                    resultDiv.innerHTML += `Shift ${entry.shift}: ${entry.decodedSentence}<br>`;
+                });
             } else {
                 resultDiv.innerHTML = `<strong>${sentence}</strong> cannot be decoded with any Caesar shift.`;
             }
@@ -86,16 +101,27 @@
             resultDiv.innerHTML += resultsHTML;
         }
 
+        // Function to count valid words in a sentence and highlight them
+        function highlightValidWords(sentence) {
+            const words = sentence.split(/\s+/);
+            let validWordCount = 0;
+            const highlightedWords = words.map(word => {
+                const isWordValid = validWords.includes(word);
+                if (isWordValid) {
+                    validWordCount++;
+                    return `<span class="valid-word">${word}</span>`;
+                } else {
+                    return word;
+                }
+            });
+            const highlightedSentence = highlightedWords.join(' ');
+            return { validWordCount, highlightedSentence };
+        }
+
         // Function to apply Caesar decipher to a sentence
         function applyCaesarDecipherToSentence(sentence, shift) {
             const words = sentence.split(/\s+/);
             return words.map(word => applyCaesarDecipher(word, shift)).join(' ');
-        }
-
-        // Function to check if a sentence contains valid words
-        function containsValidWords(sentence) {
-            const words = sentence.split(/\s+/);
-            return words.every(word => validWords.includes(word));
         }
 
         // Function to apply Caesar decipher to a word
