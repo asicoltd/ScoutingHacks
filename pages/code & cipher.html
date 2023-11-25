@@ -71,8 +71,13 @@
             }
             // Display the result
             if (decodedShift !== -1) {
+                if( decodedShift !== 0){
                 document.getElementById('result').innerHTML = `<strong>${sentence}</strong> can be decoded with a Caesar shift of ${decodedShift}. Decoded sentence: <strong>${decodedSentence}</strong>.`;
-            } else {
+                }
+                else {
+                    document.getElementById('result').innerHTML = `<strong>${sentence}</strong> is a correct sentence.';
+                }
+                } else {
                 document.getElementById('result').innerHTML = `<strong>${sentence}</strong> cannot be decoded with a Caesar shift.`;
             }
         }
