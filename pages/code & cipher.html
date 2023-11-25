@@ -62,7 +62,7 @@
             // Try decoding the sentence with different Caesar shift values
             let decodedSentence;
             let decodedShift = -1;
-            for (let shift = 1; shift <= 25; shift++) {
+            for (let shift = 0; shift <= 25; shift++) {
                 decodedSentence = applyCaesarDecipherToSentence(sentence, shift);
                 if (containsValidWords(decodedSentence)) {
                     decodedShift = shift;
