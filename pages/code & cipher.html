@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +36,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <h1>Sentence Validator with Caesar Cipher</h1>
@@ -75,7 +77,7 @@
                 const { validWordCount, highlightedSentence } = highlightValidWords(decodedSentence);
 
                 resultsHTML += `<p>Shift ${shift}: ${highlightedSentence} (${validWordCount} valid words)</p>`;
-                
+
                 if (validWordCount > 0) {
                     decodedShifts.push({ shift, decodedSentence });
                 }
@@ -83,24 +85,45 @@
 
             // Display the result
             const resultDiv = document.getElementById('result');
-            if (decodedShifts.length > 0) {
+            result = reverse(sentence);
+            resultsHTML += `<p> Reverse: ${result[0]} (${result[1]} valid words)</p>`;
+            if (decodedShifts.length > 0 && result[0] < 1) {
                 resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with the following Caesar shifts: `;
                 decodedShifts.forEach(entry => {
                     resultDiv.innerHTML += `<strong>${entry.shift}</strong>, `;
                 });
                 resultDiv.innerHTML = resultDiv.innerHTML.slice(0, -2) + `.<br>`;
-                
+
                 decodedShifts.forEach(entry => {
                     resultDiv.innerHTML += `Shift ${entry.shift}: ${entry.decodedSentence}<br>`;
                 });
-            } else {
+            }
+            else if(decodedShifts.length > 0 && result[0] > 0){
+                resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with the following Caesar shifts and reverse method: `;
+                decodedShifts.forEach(entry => {
+                    resultDiv.innerHTML += `<strong>${entry.shift}</strong>, `;
+                });
+                resultDiv.innerHTML = resultDiv.innerHTML.slice(0, -2) + `.<br>`;
+
+                decodedShifts.forEach(entry => {
+                    resultDiv.innerHTML += `Shift ${entry.shift}: ${entry.decodedSentence}<br>`;
+                });
+            }
+            else if(result[0] > 0){
+                resultDiv.innerHTML = `<strong>${sentence}</strong> can be decoded with the reverse method: `;
+            }
+             else {
                 resultDiv.innerHTML = `<strong>${sentence}</strong> cannot be decoded with any Caesar shift.`;
             }
 
             // Display all attempted shifts and results
             resultDiv.innerHTML += resultsHTML;
         }
-
+        function reverse(sentence){
+            const { validWordCount, highlightedSentence } = highlightValidWords(reverseString(sentence));
+            result = [validWordCount, highlightedSentence];
+            return result;
+        }
         // Function to count valid words in a sentence and highlight them
         function highlightValidWords(sentence) {
             const words = sentence.split(/\s+/);
@@ -141,7 +164,16 @@
             }
             return result;
         }
+        function reverseString(str) {
+                if (str === "") // This is the terminal case that will end the recursion
+                    return "";
+
+                else
+                    return reverseString(str.substr(1)) + str.charAt(0);
+            }
+        
     </script>
 
 </body>
+
 </html>
