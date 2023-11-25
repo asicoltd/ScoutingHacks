@@ -50,6 +50,20 @@
         .hidden {
             display: none;
         }
+        @media screen and (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+
+            #input-container {
+                flex-direction: column;
+            }
+
+            input,
+            button {
+                width: 100%;
+            }
+        }
     </style>
     <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
