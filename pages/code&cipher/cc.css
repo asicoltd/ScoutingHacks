@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 50px;
+}
+
+#sentence-input {
+    width: 300px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+#check-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.valid-word {
+    background-color: yellow;
+    padding: 2px;
+    border-radius: 3px;
+}
