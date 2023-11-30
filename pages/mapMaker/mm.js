@@ -1,4 +1,5 @@
 // Set up SVG container
+
 const svg = d3.select("#graph-container")
     .append("svg")
     .attr("width", "100%")
@@ -17,7 +18,6 @@ const mainPoint = svg.append("circle")
     .attr("cy", centerY)
     .attr("r", 5)
     .style("fill", "red");
-
 // Array to store generated map points
 const mapPoints = [];
 mapPoints.push({ x: centerX, y: centerY, serial: 0, degree: 0, steps: 0 });
@@ -32,8 +32,8 @@ function generateMap() {
 
     // Your logic for calculating map coordinates based on degree and steps
     // This is a placeholder, replace it with your actual calculation
-    const mapX = centerX + steps * Math.cos((degree - 90) * (Math.PI / 180));
-    const mapY = centerY + steps * Math.sin((degree - 90) * (Math.PI / 180));
+    const mapX = centerX + (steps * 10) * Math.cos((degree - 90) * (Math.PI / 180));
+    const mapY = centerY + (steps * 10) * Math.sin((degree - 90) * (Math.PI / 180));
 
     // Display the map point with serial number, degree, and steps
     const mapPoint = { x: mapX, y: mapY, serial: serialNumber, degree: degree, steps: steps };
@@ -62,9 +62,10 @@ function generateMap() {
         .enter()
         .append("text")
         .attr("class", "serial-number")
-        .attr("x", d => d.x - 5)
-        .attr("y", d => d.y + 5)
+        .attr("x", d => d.x - 3)
+        .attr("y", d => d.y + 3)
         .text(d => d.serial)
+        .attr("font-size", "10px")
         .attr("fill", "black");
 
     // Display degree and steps values
@@ -73,9 +74,10 @@ function generateMap() {
         .enter()
         .append("text")
         .attr("class", "point-info")
-        .attr("x", d => d.x + 8)
-        .attr("y", d => d.y + 15)
+        .attr("x", d => d.x + 5)
+        .attr("y", d => d.y + 3)
         .text(d => `(${d.degree}°,${d.steps})`)
+        .attr("font-size", "10px")
         .attr("fill", "black");
 
     // Hide point-info text if input fields are hidden
@@ -149,8 +151,8 @@ function generateAllMap() {
     const { degrees, steps } = getall();
     for (let i = 0; i < degrees.length; i++) {
 
-        const mapX = centerX + steps[i] * Math.cos((degrees[i] - 90) * (Math.PI / 180));
-        const mapY = centerY + steps[i] * Math.sin((degrees[i] - 90) * (Math.PI / 180));
+        const mapX = centerX + steps[i] * 10 * Math.cos((degrees[i] - 90) * (Math.PI / 180));
+        const mapY = centerY + steps[i] * 10 * Math.sin((degrees[i] - 90) * (Math.PI / 180));
 
         // Display the map point with serial number, degree, and steps
         const mapPoint = { x: mapX, y: mapY, serial: serialNumber, degree: degrees[i], steps: steps[i] };
@@ -179,9 +181,10 @@ function generateAllMap() {
             .enter()
             .append("text")
             .attr("class", "serial-number")
-            .attr("x", d => d.x - 5)
-            .attr("y", d => d.y + 5)
+            .attr("x", d => d.x - 3)
+            .attr("y", d => d.y + 3)
             .text(d => d.serial)
+            .attr("font-size", "10px")
             .attr("fill", "black");
 
         // Display degree and steps values
@@ -190,9 +193,10 @@ function generateAllMap() {
             .enter()
             .append("text")
             .attr("class", "point-info")
-            .attr("x", d => d.x + 8)
-            .attr("y", d => d.y + 15)
+            .attr("x", d => d.x + 5)
+            .attr("y", d => d.y + 3)
             .text(d => `(${d.degree}°,${d.steps})`)
+            .attr("font-size", "10px")
             .attr("fill", "black");
 
         // Hide point-info text if input fields are hidden
