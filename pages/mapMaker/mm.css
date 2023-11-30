@@ -30,14 +30,6 @@ button {
     margin-bottom: 15px;
 }
 
-.map-point {
-    fill: blue;
-}
-
-.serial-number,
-.point-info {
-    fill: black;
-}
 
 .hidden {
     display: none;

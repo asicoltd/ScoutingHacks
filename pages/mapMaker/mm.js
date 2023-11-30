@@ -54,7 +54,7 @@ function generateMap() {
         .attr("cx", d => d.x)
         .attr("cy", d => d.y)
         .attr("r", 5)
-        .style("fill", "blue");
+        .style("fill", "green");
 
     // Display serial number text
     svg.selectAll(".serial-number")
@@ -66,7 +66,7 @@ function generateMap() {
         .attr("y", d => d.y + 3)
         .text(d => d.serial)
         .attr("font-size", "10px")
-        .attr("fill", "black");
+        .attr("fill", "yellow");
 
     // Display degree and steps values
     const pointInfo = svg.selectAll(".point-info")
@@ -92,6 +92,8 @@ function generateMap() {
 
     // Increment serial number for the next point
     serialNumber++;
+
+    console.log(mapPoints);
 }
 
 // Handle Enter key press to trigger generateMap()
