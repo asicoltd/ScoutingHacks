@@ -1,0 +1,142 @@
+/* Map container */
+#map {
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding-top: 50px; /* Make room for fixed top-bar */
+}
+
+/* Top bar fixed at the top */
+#top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 10px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* GPS button in top-right */
+#gps-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#gps-button:hover {
+    background-color: #3367D6;
+}
+
+/* Bottom info panel */
+#info-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.70);
+    padding: 6px 10px;
+    text-align: left;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    font-size: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+    border-top: 1px solid #ccc;
+}
+
+/* Text formatting in info panel */
+#info-panel h4,
+#info-panel h5,
+#info-panel p,
+#info-panel label {
+    margin: 2px 0;
+    font-weight: normal;
+}
+
+/* Inputs and buttons in info panel */
+#info-panel input,
+#info-panel textarea,
+#info-panel button {
+    font-size: 12px;
+    padding: 4px 6px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#info-panel textarea {
+    resize: vertical;
+}
+
+/* Input row styling */
+.input-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.input-row textarea {
+    flex: 8;
+    resize: vertical;
+    font-size: 12px;
+    min-height: 60px;
+}
+
+.input-row button {
+    flex: 2;
+    font-size: 12px;
+    padding: 6px 4px;
+    height: fit-content;
+    white-space: nowrap;
+    min-width: 40px;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    #info-panel {
+        font-size: 11px;
+        padding: 4px 8px;
+        max-height: 120px;
+    }
+
+    #info-panel input,
+    #info-panel textarea,
+    #info-panel button {
+        font-size: 11px;
+        padding: 3px 5px;
+    }
+
+    #gps-button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .input-row {
+        flex-direction: column;
+    }
+
+    .input-row textarea,
+    .input-row button {
+        flex: unset;
+        width: 100%;
+    }
+}
