@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <title>Compass Steps Path Plotter</title>
     <style>
-        #map { height: 95vh; width: 100%; }
+        #map { height: 70vh; width: 100%; margin-top: 10px; }
+        textarea, input { width: 100%; margin-top: 5px; }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
     <h3>GPS Compass Steps Path Visualization</h3>
-    <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // Step data (degree, steps)
-        const stepsData = `
-260,40
+    <label>Enter Degree-Step pairs (format: degree,steps per line):</label>
+    <textarea id="stepsInput" rows="10">260,40
 180,207
 140,58
 250,44
@@ -36,21 +33,31 @@
 170,132
 220,35
 180,160
-260,20
-`.trim().split("\n").map(line => {
-            const [deg, steps] = line.split(",").map(Number);
-            return { degree: deg, steps: steps };
-        });
+260,20</textarea>
+
+    <label>Start Position (manual lat, lon):</label>
+    <input type="text" id="manualPosition" placeholder="e.g., 23.74875,90.42452">
+
+    <label>Search for location:</label>
+    <input type="text" id="locationSearch" placeholder="Enter location name...">
+    <button onclick="geocodeSearch()">Search & Set Start Location</button>
+
+    <button onclick="startPlot()">Plot Steps</button>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map;
 
         function degreeToRadians(deg) {
             return deg * (Math.PI / 180);
         }
 
         function calculateNewPosition(lat, lon, bearingDeg, distanceMeters) {
-            const R = 6378137; // Earth's radius in meters
+            const R = 6378137; // Earth radius in meters
             const bearing = degreeToRadians(bearingDeg);
             const δ = distanceMeters / R;
-
             const φ1 = degreeToRadians(lat);
             const λ1 = degreeToRadians(lon);
 
@@ -63,8 +70,17 @@
             return [φ2 * 180 / Math.PI, λ2 * 180 / Math.PI];
         }
 
-        function plotPath(startLat, startLon) {
-            const map = L.map('map').setView([startLat, startLon], 18);
+        function parseStepsInput() {
+            const inputText = document.getElementById('stepsInput').value.trim();
+            return inputText.split("\n").map(line => {
+                const [deg, steps] = line.split(",").map(Number);
+                return { degree: deg, steps: steps };
+            });
+        }
+
+        function plotPath(startLat, startLon, stepsData) {
+            if (map) map.remove();  // Reset map if already exists
+            map = L.map('map').setView([startLat, startLon], 18);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
@@ -76,7 +92,7 @@
             L.marker([currentLat, currentLon]).addTo(map).bindPopup('Start Position').openPopup();
 
             stepsData.forEach((step, index) => {
-                const distanceMeters = step.steps * 0.762;  // Approx 0.75 meters per step
+                const distanceMeters = step.steps * 0.75;
                 const [newLat, newLon] = calculateNewPosition(currentLat, currentLon, step.degree, distanceMeters);
 
                 currentLat = newLat;
@@ -93,23 +109,50 @@
             L.polyline(pathCoords, { color: 'blue' }).addTo(map);
         }
 
-        function start() {
+        function startPlot() {
+            const stepsData = parseStepsInput();
+            const manualPos = document.getElementById('manualPosition').value.trim();
+
+            if (manualPos) {
+                const [lat, lon] = manualPos.split(",").map(Number);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    plotPath(lat, lon, stepsData);
+                    return;
+                }
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    plotPath(lat, lon);
+                    plotPath(position.coords.latitude, position.coords.longitude, stepsData);
                 }, error => {
-                    alert('GPS failed, using default test location.');
-                    plotPath(24.0716142, 90.3775276);
+                    alert('GPS not available. Set manual position or use search.');
                 });
             } else {
-                alert('Geolocation not supported. Using default location.');
-                plotPath(24.0716142, 90.3775276);
+                alert('Geolocation not supported.');
             }
         }
 
-        start();
+        function geocodeSearch() {
+            const locationName = document.getElementById('locationSearch').value.trim();
+            if (!locationName) return;
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        document.getElementById('manualPosition').value = `${lat},${lon}`;
+                        alert(`Location found: ${lat}, ${lon}. You can now click "Plot Steps".`);
+                    } else {
+                        alert('Location not found.');
+                    }
+                })
+                .catch(error => {
+                    alert('Error searching location.');
+                    console.error(error);
+                });
+        }
     </script>
 </body>
 </html>
