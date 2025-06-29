@@ -76,7 +76,7 @@
             L.marker([currentLat, currentLon]).addTo(map).bindPopup('Start Position').openPopup();
 
             stepsData.forEach((step, index) => {
-                const distanceMeters = step.steps * 0.75;  // Approx 0.75 meters per step
+                const distanceMeters = step.steps * 0.762;  // Approx 0.75 meters per step
                 const [newLat, newLon] = calculateNewPosition(currentLat, currentLon, step.degree, distanceMeters);
 
                 currentLat = newLat;
@@ -101,11 +101,11 @@
                     plotPath(lat, lon);
                 }, error => {
                     alert('GPS failed, using default test location.');
-                    plotPath(23.74875000, 90.42452778);
+                    plotPath(24.0716142, 90.3775276);
                 });
             } else {
                 alert('Geolocation not supported. Using default location.');
-                plotPath(23.74875000, 90.42452778);
+                plotPath(24.0716142, 90.3775276);
             }
         }
 
