@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Compass Steps Path Plotter</title>
+    <style>
+        #map { height: 95vh; width: 100%; }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+    <h3>GPS Compass Steps Path Visualization</h3>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Step data (degree, steps)
+        const stepsData = `
+260,40
+180,207
+140,58
+250,44
+320,210
+320,60
+310,122
+320,108
+310,35
+310,68
+220,8
+270,30
+220,50
+270,25
+170,134
+180,70
+240,34
+170,132
+220,35
+180,160
+260,20
+`.trim().split("\n").map(line => {
+            const [deg, steps] = line.split(",").map(Number);
+            return { degree: deg, steps: steps };
+        });
+
+        function degreeToRadians(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function calculateNewPosition(lat, lon, bearingDeg, distanceMeters) {
+            const R = 6378137; // Earth's radius in meters
+            const bearing = degreeToRadians(bearingDeg);
+            const δ = distanceMeters / R;
+
+            const φ1 = degreeToRadians(lat);
+            const λ1 = degreeToRadians(lon);
+
+            const φ2 = Math.asin(Math.sin(φ1) * Math.cos(δ) +
+                Math.cos(φ1) * Math.sin(δ) * Math.cos(bearing));
+
+            const λ2 = λ1 + Math.atan2(Math.sin(bearing) * Math.sin(δ) * Math.cos(φ1),
+                Math.cos(δ) - Math.sin(φ1) * Math.sin(φ2));
+
+            return [φ2 * 180 / Math.PI, λ2 * 180 / Math.PI];
+        }
+
+        function plotPath(startLat, startLon) {
+            const map = L.map('map').setView([startLat, startLon], 18);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            let pathCoords = [[startLat, startLon]];
+            let currentLat = startLat;
+            let currentLon = startLon;
+
+            L.marker([currentLat, currentLon]).addTo(map).bindPopup('Start Position').openPopup();
+
+            stepsData.forEach((step, index) => {
+                const distanceMeters = step.steps * 0.75;  // Approx 0.75 meters per step
+                const [newLat, newLon] = calculateNewPosition(currentLat, currentLon, step.degree, distanceMeters);
+
+                currentLat = newLat;
+                currentLon = newLon;
+
+                pathCoords.push([currentLat, currentLon]);
+
+                L.circleMarker([currentLat, currentLon], {
+                    radius: 4,
+                    color: 'red'
+                }).addTo(map).bindPopup(`Step ${index + 1}<br>Heading: ${step.degree}°<br>Steps: ${step.steps}`);
+            });
+
+            L.polyline(pathCoords, { color: 'blue' }).addTo(map);
+        }
+
+        function start() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    plotPath(lat, lon);
+                }, error => {
+                    alert('GPS failed, using default test location.');
+                    plotPath(23.74875000, 90.42452778);
+                });
+            } else {
+                alert('Geolocation not supported. Using default location.');
+                plotPath(23.74875000, 90.42452778);
+            }
+        }
+
+        start();
+    </script>
+</body>
+</html>
