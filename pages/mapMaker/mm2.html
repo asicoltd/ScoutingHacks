@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <title>Compass Steps Path Plotter</title>
     <style>
-        #map { height: 70vh; width: 100%; margin-top: 10px; }
+        #map { height: 80vh; width: 100%; margin-top: 10px; }
+        #controls { background: #f9f9f9; padding: 10px; border: 1px solid #ccc; margin-bottom: 5px; }
         textarea, input { width: 100%; margin-top: 5px; }
+        button { margin-top: 5px; }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
     <h3>GPS Compass Steps Path Visualization</h3>
 
-    <label>Enter Degree-Step pairs (format: degree,steps per line):</label>
-    <textarea id="stepsInput" rows="10">260,40
+    <button onclick="toggleControls()" id="toggleBtn">Minimize Controls</button>
+
+    <div id="controls">
+        <label>Enter Degree-Step pairs (format: degree,steps per line):</label>
+        <textarea id="stepsInput" rows="10">260,40
 180,207
 140,58
 250,44
@@ -35,27 +40,35 @@
 180,160
 260,20</textarea>
 
-    <label>Start Position (manual lat, lon):</label>
-    <input type="text" id="manualPosition" placeholder="e.g., 23.74875,90.42452">
+        <label>Start Position (manual lat, lon):</label>
+        <input type="text" id="manualPosition" placeholder="e.g., 23.74875,90.42452">
 
-    <label>Search for location:</label>
-    <input type="text" id="locationSearch" placeholder="Enter location name...">
-    <button onclick="geocodeSearch()">Search & Set Start Location</button>
+        <label>Search for location:</label>
+        <input type="text" id="locationSearch" placeholder="Enter location name...">
+        <button onclick="geocodeSearch()">Search & Set Start Location</button>
 
-    <button onclick="startPlot()">Plot Steps</button>
+        <button onclick="startPlot()">Plot Steps</button>
+    </div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         let map;
+        let controlsVisible = true;
+
+        function toggleControls() {
+            controlsVisible = !controlsVisible;
+            document.getElementById('controls').style.display = controlsVisible ? 'block' : 'none';
+            document.getElementById('toggleBtn').innerText = controlsVisible ? 'Minimize Controls' : 'Show Controls';
+        }
 
         function degreeToRadians(deg) {
             return deg * (Math.PI / 180);
         }
 
         function calculateNewPosition(lat, lon, bearingDeg, distanceMeters) {
-            const R = 6378137; // Earth radius in meters
+            const R = 6378137;
             const bearing = degreeToRadians(bearingDeg);
             const δ = distanceMeters / R;
             const φ1 = degreeToRadians(lat);
@@ -79,7 +92,7 @@
         }
 
         function plotPath(startLat, startLon, stepsData) {
-            if (map) map.remove();  // Reset map if already exists
+            if (map) map.remove();
             map = L.map('map').setView([startLat, startLon], 18);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
@@ -125,10 +138,10 @@
                 navigator.geolocation.getCurrentPosition(position => {
                     plotPath(position.coords.latitude, position.coords.longitude, stepsData);
                 }, error => {
-                    alert('GPS not available. Set manual position or use search.');
+                    alert('GPS failed. Please enter manual coordinates or search a location.');
                 });
             } else {
-                alert('Geolocation not supported.');
+                alert('Geolocation not supported. Please use manual coordinates.');
             }
         }
 
@@ -143,13 +156,13 @@
                         const lat = parseFloat(data[0].lat);
                         const lon = parseFloat(data[0].lon);
                         document.getElementById('manualPosition').value = `${lat},${lon}`;
-                        alert(`Location found: ${lat}, ${lon}. You can now click "Plot Steps".`);
+                        alert(`Location found: ${lat}, ${lon}. Now click "Plot Steps".`);
                     } else {
                         alert('Location not found.');
                     }
                 })
                 .catch(error => {
-                    alert('Error searching location.');
+                    alert('Error during location search.');
                     console.error(error);
                 });
         }
